@@ -2,7 +2,7 @@
 
 Public repo of the Zoomzeem studio. A dry-run duplicate photo finder that wraps czkawka_cli, and the app we may build on it.
 
-## Rails (enforced by .claude/settings.json where possible)
+## Rails (rules first; .claude/settings.json and the hook add best-effort blocking)
 - Open draft pull requests only. Never push to main, never merge.
 - The author never merges. A reviewer reads the head SHA of the PR and posts a pass. Anything touching file moves or deletes, or .github/workflows, needs a line-by-line reviewer pass.
 - No spend: no card, no paid service, no signing certificate, no domain. Free only. If something would cost money, stop and say so.
@@ -20,3 +20,7 @@ Public repo of the Zoomzeem studio. A dry-run duplicate photo finder that wraps 
 
 ## Subagents
 engineer, reviewer (read-only), qa. Product, outreach and scheduling stay with the studio's other agents.
+
+## Honest limits of the guard
+The deny rules and the hook (.claude/hooks) parse the commands Claude runs and block pushes without an explicit non-default branch, merges, releases, secrets, commits on main, and writes to workflow, secret and guard files. They are best effort, not a sandbox: Edit and Write denies do not stop a script that Bash launches (python script.py, make, npm run), and a command the guard cannot parse is only caught if it looks unsafe. If the guard itself fails to run, the call is blocked.
+Real enforcement has to be server-side, set by the repo owner: a ruleset on main (pull request and review required, no force push), CODEOWNERS on .github/workflows and .claude, deploy secrets kept out of the session environment, and a token that cannot merge. This PR does not set those. Do not treat the hook as proof the rails hold.
