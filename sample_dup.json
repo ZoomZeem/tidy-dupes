@@ -1,0 +1,18 @@
+{
+  "34077": [
+    [
+      {
+        "path": "/tmp/cz/fx/a_exact_copy.jpg",
+        "modified_date": 1791860670,
+        "size": 34077,
+        "hash": "13bed62783b9b9bde1339da7188d3621053be1aa086964b2e0754997ffc05f90"
+      },
+      {
+        "path": "/tmp/cz/fx/a_original.jpg",
+        "modified_date": 1791860670,
+        "size": 34077,
+        "hash": "13bed62783b9b9bde1339da7188d3621053be1aa086964b2e0754997ffc05f90"
+      }
+    ]
+  ]
+}
