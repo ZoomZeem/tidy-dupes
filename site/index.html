@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Find exact duplicate photos, safely (dry run)</title>
+<style>
+body{font:16px/1.5 system-ui,sans-serif;max-width:40rem;margin:2rem auto;padding:0 1rem;color:#1a1a1a}
+code,pre{background:#f3f3f3;border-radius:4px;padding:.15rem .35rem}
+pre{padding:.75rem;overflow:auto}
+small{color:#555}
+</style>
+</head>
+<body>
+<h1>Find exact duplicate photos, safely</h1>
+<p>One command prints which photos in a folder are byte-for-byte copies, which one it would keep, and how much space the extras use. It is a <strong>dry run</strong>: it never deletes or moves anything.</p>
+<pre>python3 tidy_dupes.py ~/Pictures</pre>
+<p><a href="tidy_dupes.py" download>Download tidy_dupes.py</a> (about 100 lines, plain Python 3, no extra packages).</p>
+<h2>What you need</h2>
+<p>The free, open-source <a href="https://github.com/qarmin/czkawka/releases">czkawka_cli</a> on your PATH. Check the file's sha256 on the release page before you run it.</p>
+<h2>What it does and does not do</h2>
+<ul>
+<li>Exact copies only (same bytes), including small files; empty files are ignored. It does not find "similar" photos.</li>
+<li>Tested on JPEG and BMP in a small synthetic folder. PNG and WebP are not verified.</li>
+<li>Keeps the oldest-modified file in each group and lists the rest as copies.</li>
+<li>This is an early experiment, not a finished product. Czkawka and its authors are not involved.</li>
+</ul>
+<p><small>Built by the Zoomzeem studio.</small></p>
+</body>
+</html>
