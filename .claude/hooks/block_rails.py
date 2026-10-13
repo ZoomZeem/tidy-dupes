@@ -65,6 +65,14 @@ def is_write_protected(path):
     )
 
 
+PARENTS = (".claude", ".github")
+
+
+def is_protected_parent(path):
+    p = norm(path)
+    return p.rsplit("/", 1)[-1] in PARENTS or p in ("", "..") or p.endswith("/..")
+
+
 def current_branch(cwd):
     try:
         out = subprocess.run(["git", "-C", cwd, "rev-parse", "--abbrev-ref", "HEAD"], capture_output=True, text=True, timeout=10)
@@ -121,6 +129,8 @@ def check_paths(tokens, writing):
             raise Deny("secret and env files are off limits (read, write or stage)")
         if writing and is_write_protected(t):
             raise Deny("workflow files and the guard's own files need a real reviewer pass; do not write them from a session")
+        if writing and is_protected_parent(t) and not t.startswith("-"):
+            raise Deny("this path is, or contains, workflow or guard files; do not remove, move or overwrite it from a session")
 
 
 def check_git(args, cwd):
@@ -157,6 +167,8 @@ def check_git(args, cwd):
                 raise Deny("force refspec")
             if ref.startswith(":"):
                 raise Deny("deleting a remote branch")
+            if any(ch in ref for ch in "*?[{"):
+                raise Deny("glob refspec can include the default branch")
             src, _, dst = ref.partition(":")
             dest = dst if ":" in ref else src
             dest = re.sub(r"^refs/heads/", "", dest)
@@ -198,15 +210,18 @@ def check_gh(args):
         raise Deny("the author does not approve their own PR")
     if top == "api":
         method = "GET"
+        field = False
         for j, a in enumerate(args):
             if a in ("-X", "--method") and j + 1 < len(args):
                 method = args[j + 1].upper()
             if a.startswith("--method="):
                 method = a.split("=", 1)[1].upper()
-            if a in ("-f", "-F", "--field", "--raw-field", "--input"):
-                method = method if method != "GET" else "POST"
-        if method != "GET" or "merge" in " ".join(args):
-            raise Deny("gh api with a write method or a merge call")
+            if a.startswith("-X") and len(a) > 2:
+                method = a[2:].upper()
+            if re.match(r"^(-f|-F)", a) or a.startswith(("--field", "--raw-field", "--input")):
+                field = True
+        if method != "GET" or field or "merge" in " ".join(args):
+            raise Deny("gh api with a write method, field options or a merge call")
 
 
 def check_simple(tokens, cwd, depth=0):
@@ -239,12 +254,21 @@ def check_simple(tokens, cwd, depth=0):
         code = " ".join(args)
         if re.search(r"\.env|\.pem|id_rsa|id_ed25519|credentials|\.npmrc|\.netrc|\.aws|\.ssh|secrets?\b|\.github/+workflows|\.claude/+(settings|hooks)", code):
             raise Deny("inline code that names secret, workflow or guard files")
+    if prog in ("cd", "pushd", "chdir"):
+        for a in args:
+            if not a.startswith("-") and (is_protected_parent(a) or is_write_protected(a) or is_secret(a)):
+                raise Deny("do not change into workflow, guard or secret directories")
     if prog == "git":
         check_git(args, cwd)
     elif prog == "gh":
         check_gh(args)
     else:
-        check_paths(args, prog not in READ_ONLY)
+        read_only = prog in READ_ONLY
+        if prog == "find" and any(a in ("-delete", "-exec", "-execdir", "-ok", "-okdir", "-fprint", "-fprint0", "-fprintf", "-fls") for a in args):
+            read_only = False
+        if prog == "rm" and any(re.fullmatch(r"-[a-zA-Z]*[rR][a-zA-Z]*|--recursive", a) for a in args) and any(a in (".", "..", "/", "~", "*", "./", "../", "./*", "../*", "/*") for a in args):
+            raise Deny("recursive remove of a broad path")
+        check_paths(args, not read_only)
 
 
 def check_command(cmd, cwd, depth=0):
