@@ -12,8 +12,15 @@
       "Bash(wrangler *)",
       "Edit(.github/workflows/**)",
       "Write(.github/workflows/**)",
+      "Edit(.claude/settings*.json)",
+      "Write(.claude/settings*.json)",
+      "Edit(.claude/hooks/**)",
+      "Write(.claude/hooks/**)",
       "Edit(**/.env*)",
-      "Write(**/.env*)"
+      "Write(**/.env*)",
+      "Read(**/.env*)",
+      "Read(**/secrets/**)",
+      "Read(**/*.pem)"
     ],
     "ask": [
       "Bash(git push *)",
@@ -26,7 +33,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Bash",
+        "matcher": "Bash|Edit|Write|MultiEdit|NotebookEdit|Read",
         "hooks": [
           {
             "type": "command",
