@@ -93,6 +93,28 @@ BASH = [
     ("ls environment", "feat", "allow"),
     ("git log --oneline | head", "feat", "allow"),
     ("echo done 2>&1", "feat", "allow"),
+    # round 3 findings
+    ("rm -rf .claude", "feat", "deny"),
+    ("rm -rf .github", "feat", "deny"),
+    ("rm -rf ./.github/", "feat", "deny"),
+    ("rm -rf .", "feat", "deny"),
+    ("rm -rf ..", "feat", "deny"),
+    ("mv .claude /tmp/x", "feat", "deny"),
+    ("rm -rf build", "feat", "allow"),
+    ("find .github/workflows -delete", "feat", "deny"),
+    ("find .github -name x -exec rm {} ;", "feat", "deny"),
+    ("find . -name '*.py'", "feat", "allow"),
+    ("git push origin 'refs/heads/*:refs/heads/*'", "feat", "deny"),
+    ("git push origin refs/heads/*:refs/heads/*", "feat", "deny"),
+    ("gh api repos/o/r/contents/x -fcontent=dummy", "feat", "deny"),
+    ("gh api repos/o/r/contents/x -Fmessage=hi", "feat", "deny"),
+    ("gh api repos/o/r/contents/x --field=a=b", "feat", "deny"),
+    ("gh api repos/o/r/contents/x --input=body.json", "feat", "deny"),
+    ("gh api repos/o/r/contents/x -XPUT", "feat", "deny"),
+    ("gh api repos/o/r/contents/x", "feat", "allow"),
+    ("cd .github/workflows && rm ci.yml", "feat", "deny"),
+    ("cd .claude; rm -rf hooks", "feat", "deny"),
+    ("cd apps/tidy && pytest", "feat", "allow"),
 ]
 
 TOOLS = [
