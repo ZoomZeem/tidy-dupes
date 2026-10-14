@@ -32,7 +32,7 @@ Keep this file under 200 lines. Rules about one subdirectory go in that subdirec
 - Deploy: free rail only (Cloudflare Pages, project zoomzeem-tidy, https://zoomzeem-tidy.pages.dev/). Today the deploy runs from studio-sandbox apps/tidy, a second copy of the files; see docs/deploy.md if present. Changing the page or script means changing both copies until the deploy moves here. A change here is not live until the deploy has run and you have checked the live URL.
 
 ## Subagents and skills
-Agents: spec-writer, engineer, qa, reviewer-code, reviewer-security, approver (all in .claude/agents). Skills: factory (the loop), lessons (the feedback loop), build-playbook (card to draft PR), review-checklist (PR review). Product, outreach and scheduling stay with the studio's other agents.
+Agents: spec-writer, engineer, qa, reviewer-code, reviewer-security, approver (all in .claude/agents). Skills: factory (the loop), lessons (the feedback loop), build-playbook (card to draft PR), review-checklist (PR review), diagnosing-bugs (third-party, MIT, pinned; see its UPSTREAM.md). Product, outreach and scheduling stay with the studio's other agents.
 
 ## Invariants
 - The script is a dry run: it has no delete, move or rename code, and a test must keep it that way. Never delete or overwrite a user's files. Any future move feature goes to a quarantine folder with a manifest and can undo; no permanent delete.
